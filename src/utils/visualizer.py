@@ -1,6 +1,8 @@
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import ttk
 from maze.grid import Grid
+from algorithms.BFS import BFS
 
 
 class UI(tk.Frame):
@@ -10,6 +12,9 @@ class UI(tk.Frame):
         self.parent = parent
         self.grid_object = Grid.from_file()
         self.grid_cell_array = []
+        self.algorithms = {
+            "BFS": BFS
+        }
         self.init_ui()
 
     def init_ui(self):
@@ -49,19 +54,22 @@ class UI(tk.Frame):
             ).pack(side=tk.LEFT, padx=5)
 
         # Algorythms combox
-        algorythms_list = ttk.Combobox(
+        self.algorythms_list = ttk.Combobox(
             self.control_frame,
             state="readonly",
-            values=["djkastra", "algorythm2", "algorythm3"]
+            values=["BFS"]
         )
-        algorythms_list.pack(side=tk.LEFT, padx=(20, 0))
-        algorythms_list.set("Algorythms")
+        self.algorythms_list.pack(side=tk.LEFT, padx=(20, 0))
+        self.algorythms_list.set("Algorythms")
 
         # Run Algorythm Button
-        tk.Button(
+        self.run_button = tk.Button(
             self.control_frame,
             text="Run",
-            ).pack(side=tk.LEFT, padx=5)
+            state="normal",
+            command=self.run_button_func
+            )
+        self.run_button.pack(side=tk.LEFT, padx=5)
 
         # Grid Frame
         self.grid_frame = tk.Frame(self.parent)
@@ -69,6 +77,7 @@ class UI(tk.Frame):
 
         self.create_visual_grid()
 
+    # Visual grid functions
     def click_on_cell(self, cell, i, j):
         symbol = self.grid_object.change_cell(i, j)
         cell.config(text=symbol)
@@ -89,19 +98,85 @@ class UI(tk.Frame):
                 cell.grid(row=i, column=j)
                 if (i, j) not in [self.grid_object.start, self.grid_object.end]:
                     cell.config(command=lambda c=cell, i=i, j=j: self.click_on_cell(c, i, j))
-                    row.append(cell)
+                row.append(cell)
 
             self.grid_cell_array.append(row)
 
+    # Load button functions
     def load_maze(self):
         self.grid_object = Grid.from_file(self.grid_object.PATHS["user_matrix"])
         for widget in self.grid_frame.winfo_children():
             widget.destroy()
         self.create_visual_grid()
 
+    # Clear button functions
     def clear_grid(self):
         self.grid_object.clear_matrix()
 
         for i, array in enumerate(self.grid_cell_array):
             for j, cell in enumerate(array):
                 cell.config(text=self.grid_object.get_symbol(i, j))
+
+    # Run button functions
+    def run_button_func(self):
+
+        if self.run_button.cget("text") == "Run":
+
+            self.run_algorythm()
+            self.run_button.config(text="Restart")
+
+        else:
+
+            for i, array in enumerate(self.grid_cell_array):
+
+                for j, cell in enumerate(array):
+
+                    if cell.cget("text") == "\U0001F7E6":
+                        cell.config(text=self.grid_object.get_symbol(i, j))
+
+            self.end_animation()
+
+            self.run_button.config(text="Run")
+
+    def run_algorythm(self):
+        selected = self.algorythms_list.get()
+
+        if selected not in self.algorithms:
+            print("Select an algorithm")
+            return
+
+        algo_func = self.algorithms[selected]
+        start = self.grid_object.start
+        end = self.grid_object.end
+        matrix = self.grid_object.matrix
+
+        maze_data = algo_func(start, end, matrix)
+
+        self.run_solution_animation(maze_data["maze_solution"])
+
+        messagebox.showinfo(
+            "example tittle",
+            f"Real time solution: {maze_data["real_time_solve"]} seconds\n"
+            f"Visited cells: {maze_data["visited_nodes"]}\n"
+            f"Path length: {maze_data["solution_length"]} cells"
+            )
+
+    def run_solution_animation(self, path, index=0):
+
+        for widget in self.control_frame.winfo_children():
+            if isinstance(widget, tk.Button):
+                widget.config(state="disabled")
+
+        if index >= len(path):
+            self.run_button.config(state="normal")
+            return
+
+        i, j = path[index]
+        self.grid_cell_array[i][j].config(text="\U0001F7E6")
+        self.after(50, lambda: self.run_solution_animation(path, index + 1))
+
+    def end_animation(self):
+
+        for widget in self.control_frame.winfo_children():
+            if isinstance(widget, tk.Button):
+                widget.config(state="normal")
