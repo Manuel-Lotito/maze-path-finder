@@ -121,10 +121,7 @@ class UI(tk.Frame):
     def run_button_func(self):
 
         if self.run_button.cget("text") == "Run":
-
             self.run_algorythm()
-            self.run_button.config(text="Restart")
-
         else:
 
             for i, array in enumerate(self.grid_cell_array):
@@ -142,8 +139,11 @@ class UI(tk.Frame):
         selected = self.algorythms_list.get()
 
         if selected not in self.algorithms:
-            print("Select an algorithm")
+            messagebox.showinfo("no algorithm selected",
+                                "Please select an algorithm")
             return
+
+        self.run_button.config(text="Restart")
 
         algo_func = self.algorithms[selected]
         start = self.grid_object.start
@@ -155,7 +155,7 @@ class UI(tk.Frame):
         self.run_solution_animation(maze_data["maze_solution"])
 
         messagebox.showinfo(
-            "example tittle",
+            "Maze stats",
             f"Real time solution: {maze_data["real_time_solve"]} seconds\n"
             f"Visited cells: {maze_data["visited_nodes"]}\n"
             f"Path length: {maze_data["solution_length"]} cells"

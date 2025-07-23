@@ -10,8 +10,8 @@ class Grid:
     }
 
     PATHS = {
-        "main_matrix": "src\\texto.txt",
-        "user_matrix": "src\\texto1.txt"
+        "main_matrix": "src\\maze.txt",
+        "user_matrix": "src\\my_maze.txt"
     }
 
     def __init__(self, matrix, start, end):
@@ -21,7 +21,7 @@ class Grid:
 
     # Function to get matrix from the file
     @classmethod
-    def from_file(cls, matrix_path="src\\texto.txt"):
+    def from_file(cls, matrix_path="src\\maze.txt"):
         open_path = open(matrix_path, "r")
         lines = open_path.readlines()
         open_path.close()
