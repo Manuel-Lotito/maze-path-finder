@@ -3,6 +3,7 @@ from tkinter import messagebox
 from tkinter import ttk
 from maze.grid import Grid
 from algorithms.BFS import BFS
+from algorithms.Greedy_BFS import Greedy_BFS
 
 
 class UI(tk.Frame):
@@ -13,7 +14,8 @@ class UI(tk.Frame):
         self.grid_object = Grid.from_file()
         self.grid_cell_array = []
         self.algorithms = {
-            "BFS": BFS
+            "BFS": BFS,
+            "Greedy BFS": Greedy_BFS
         }
         self.init_ui()
 
@@ -57,7 +59,7 @@ class UI(tk.Frame):
         self.algorythms_list = ttk.Combobox(
             self.control_frame,
             state="readonly",
-            values=["BFS"]
+            values=["BFS", "Greedy BFS"]
         )
         self.algorythms_list.pack(side=tk.LEFT, padx=(20, 0))
         self.algorythms_list.set("Algorythms")
@@ -130,6 +132,7 @@ class UI(tk.Frame):
 
                     if cell.cget("text") == "\U0001F7E6":
                         cell.config(text=self.grid_object.get_symbol(i, j))
+                        cell.config(state="normal")
 
             self.end_animation()
 
@@ -172,7 +175,7 @@ class UI(tk.Frame):
             return
 
         i, j = path[index]
-        self.grid_cell_array[i][j].config(text="\U0001F7E6")
+        self.grid_cell_array[i][j].config(text="\U0001F7E6", state="disabled")
         self.after(50, lambda: self.run_solution_animation(path, index + 1))
 
     def end_animation(self):
