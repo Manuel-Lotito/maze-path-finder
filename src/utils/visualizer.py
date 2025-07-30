@@ -4,6 +4,7 @@ from tkinter import ttk
 from maze.grid import Grid
 from algorithms.BFS import BFS
 from algorithms.Greedy_BFS import Greedy_BFS
+from algorithms.A_STAR import A_STAR
 
 
 class UI(tk.Frame):
@@ -15,7 +16,8 @@ class UI(tk.Frame):
         self.grid_cell_array = []
         self.algorithms = {
             "BFS": BFS,
-            "Greedy BFS": Greedy_BFS
+            "Greedy BFS": Greedy_BFS,
+            "A STAR": A_STAR
         }
         self.init_ui()
 
@@ -59,7 +61,7 @@ class UI(tk.Frame):
         self.algorythms_list = ttk.Combobox(
             self.control_frame,
             state="readonly",
-            values=["BFS", "Greedy BFS"]
+            values=["BFS", "Greedy BFS", "A STAR"]
         )
         self.algorythms_list.pack(side=tk.LEFT, padx=(20, 0))
         self.algorythms_list.set("Algorythms")
@@ -146,14 +148,19 @@ class UI(tk.Frame):
                                 "Please select an algorithm")
             return
 
-        self.run_button.config(text="Restart")
-
         algo_func = self.algorithms[selected]
         start = self.grid_object.start
         end = self.grid_object.end
         matrix = self.grid_object.matrix
 
         maze_data = algo_func(start, end, matrix)
+
+        if not maze_data:
+            messagebox.showinfo("Maze is unsolvable",
+                                "no valid path from start to end.")
+            return
+
+        self.run_button.config(text="Restart")
 
         self.run_solution_animation(maze_data["maze_solution"])
 
