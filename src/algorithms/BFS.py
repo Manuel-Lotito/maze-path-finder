@@ -62,3 +62,5 @@ def BFS(start, end, matrix):
                 queue.put(neighbour)
                 visited.add(neighbour)
                 came_from[neighbour] = current
+
+    return False

@@ -65,3 +65,5 @@ def Greedy_BFS(start, end, matrix):
                 heapq.heappush(open_set, (manhattan(neighbour, end), neighbour))
                 came_from[neighbour] = current
                 visited.add(neighbour)
+
+    return False
