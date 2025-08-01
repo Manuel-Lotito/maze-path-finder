@@ -1,3 +1,4 @@
+import random
 
 
 class Grid:
@@ -47,7 +48,7 @@ class Grid:
 
         return cls(matrix, start, end)
 
-    # Function to draw matrix
+    # Function to draw maze
     def get_symbol(self, y, x):
         if (y, x) == self.start:
             return self.SYMBOLS["start"]
@@ -70,7 +71,7 @@ class Grid:
 
         return self.get_symbol(y, x)
 
-    # Function to clear the matrix
+    # Function to clear the maze
     def clear_matrix(self):
         for y in range(len(self.matrix)):
 
@@ -79,7 +80,7 @@ class Grid:
                 if (y, x) not in [self.start, self.end]:
                     self.matrix[y][x] = " "
 
-    # Function to save the matrix
+    # Function to save the maze
     def save_matrix(self):
 
         path = self.PATHS["user_matrix"]
@@ -93,3 +94,30 @@ class Grid:
 
                 if i < len(self.matrix) - 1:
                     my_maze.write("\n")
+
+    # Function to generate maze
+    def generate_maze(self):
+
+        new_maze = [["#" for _ in range(21)] for _ in range(21)]
+
+        self.random_maze(new_maze, 1, 1)
+
+        new_maze[1][1] = "S"
+        new_maze[19][19] = "E"
+        self.start = (1, 1)
+        self.end = (19, 19)
+
+        self.matrix = new_maze
+
+    # Function to randomize a maze
+    def random_maze(self, maze, y, x):
+        maze[y][x] = " "
+        directions = [(0, 2), (0, -2), (2, 0), (-2, 0)]
+        random.shuffle(directions)
+
+        for dy, dx in directions:
+            ny, nx = y + dy, x + dx
+
+            if 0 < ny < len(maze) and 0 < nx < len(maze[0]) and maze[ny][nx] == "#":
+                maze[y + dy // 2][x + dx // 2] = " "
+                self.random_maze(maze, ny, nx)

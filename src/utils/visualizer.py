@@ -34,6 +34,7 @@ class UI(tk.Frame):
         tk.Button(
             self.control_frame,
             text="Random Maze",
+            command=self.random_maze_button
             ).pack(side=tk.LEFT, padx=(0, 20))
 
         # Clear Button
@@ -108,13 +109,18 @@ class UI(tk.Frame):
 
     # Load button functions
     def load_maze(self):
+
         self.grid_object = Grid.from_file(self.grid_object.PATHS["user_matrix"])
+
         for widget in self.grid_frame.winfo_children():
+
             widget.destroy()
+
         self.create_visual_grid()
 
     # Clear button functions
     def clear_grid(self):
+
         self.grid_object.clear_matrix()
 
         for i, array in enumerate(self.grid_cell_array):
@@ -141,6 +147,7 @@ class UI(tk.Frame):
             self.run_button.config(text="Run")
 
     def run_algorythm(self):
+
         selected = self.algorythms_list.get()
 
         if selected not in self.algorithms:
@@ -190,3 +197,15 @@ class UI(tk.Frame):
         for widget in self.control_frame.winfo_children():
             if isinstance(widget, tk.Button):
                 widget.config(state="normal")
+
+    # Random maze functions
+
+    def random_maze_button(self):
+
+        self.grid_object.generate_maze()
+
+        for i, array in enumerate(self.grid_cell_array):
+
+            for j, cell in enumerate(array):
+
+                cell.config(text=self.grid_object.get_symbol(i, j))
