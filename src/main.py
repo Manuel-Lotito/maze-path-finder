@@ -1,5 +1,5 @@
 import tkinter as tk
-from utils.visualizer import UI
+from ui.visualizer import UI
 
 
 if __name__ == "__main__":

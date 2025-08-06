@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
-from maze.grid import Grid
-from algorithms.BFS import BFS
-from algorithms.Greedy_BFS import Greedy_BFS
-from algorithms.A_STAR import A_STAR
+from models.grid import Grid
+from servicies.BFS import BFS
+from servicies.Greedy_BFS import Greedy_BFS
+from servicies.A_STAR import A_STAR
 
 
 class UI(tk.Frame):
@@ -84,7 +84,7 @@ class UI(tk.Frame):
 
     # Visual grid functions
     def click_on_cell(self, cell, i, j):
-        symbol = self.grid_object.change_cell(i, j)
+        symbol = self.grid_object.matrix[i][j].change_cell()
         cell.config(text=symbol)
 
     def create_visual_grid(self):
@@ -96,7 +96,7 @@ class UI(tk.Frame):
             for j in range(len(self.grid_object.matrix[0])):
                 cell = tk.Button(
                     self.grid_frame,
-                    text=self.grid_object.get_symbol(i, j),
+                    text=self.grid_object.matrix[i][j].get_symbol(),
                     width=2,
                     height=1,
                 )
@@ -112,11 +112,11 @@ class UI(tk.Frame):
 
         self.grid_object = Grid.from_file(self.grid_object.PATHS["user_matrix"])
 
-        for widget in self.grid_frame.winfo_children():
+        for i, array in enumerate(self.grid_cell_array):
 
-            widget.destroy()
+            for j, cell in enumerate(array):
 
-        self.create_visual_grid()
+                cell.config(text=self.grid_object.matrix[i][j].get_symbol())
 
     # Clear button functions
     def clear_grid(self):
@@ -125,7 +125,7 @@ class UI(tk.Frame):
 
         for i, array in enumerate(self.grid_cell_array):
             for j, cell in enumerate(array):
-                cell.config(text=self.grid_object.get_symbol(i, j))
+                cell.config(text=self.grid_object.matrix[i][j].get_symbol())
 
     # Run button functions
     def run_button_func(self):
@@ -138,9 +138,11 @@ class UI(tk.Frame):
 
                 for j, cell in enumerate(array):
 
-                    if cell.cget("text") == "\U0001F7E6":
-                        cell.config(text=self.grid_object.get_symbol(i, j))
-                        cell.config(state="normal")
+                    if cell.cget("text") != "\U0001F7E6":
+                        continue
+
+                    cell.config(text=self.grid_object.matrix[i][j].get_symbol())
+                    cell.config(state="normal")
 
             self.end_animation()
 
@@ -155,12 +157,14 @@ class UI(tk.Frame):
                                 "Please select an algorithm")
             return
 
-        algo_func = self.algorithms[selected]
+        algo_class = self.algorithms[selected]
+        algo_instance = algo_class()
+
         start = self.grid_object.start
         end = self.grid_object.end
-        matrix = self.grid_object.matrix
+        matrix = self.grid_object.to_char_matrix()
 
-        maze_data = algo_func(start, end, matrix)
+        maze_data = algo_instance.solve(start, end, matrix)
 
         if not maze_data:
             messagebox.showinfo("Maze is unsolvable",
@@ -208,4 +212,4 @@ class UI(tk.Frame):
 
             for j, cell in enumerate(array):
 
-                cell.config(text=self.grid_object.get_symbol(i, j))
+                cell.config(text=self.grid_object.matrix[i][j].get_symbol())
